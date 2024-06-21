@@ -12,7 +12,8 @@ repositories {
 
 def restAssuredVersion = "5.4.0",
     allureVersion = "2.21.0",
-    selenideVersion = "6.19.1"
+    selenideVersion = "6.19.1",
+        ownerVersion = "1.0.12"
 
 allure {
     report {
@@ -35,6 +36,7 @@ dependencies {
             "io.rest-assured:rest-assured:$restAssuredVersion",
             "io.rest-assured:json-schema-validator:$restAssuredVersion",
             "io.qameta.allure:allure-rest-assured:$allureVersion",
+            "org.aeonbits.owner:owner:$ownerVersion",
             "io.appium:java-client:8.6.0",
             "org.junit.jupiter:junit-jupiter:5.10.2",
             "org.slf4j:slf4j-simple:2.0.12",
@@ -51,6 +53,17 @@ tasks.withType(Test) {
             events "started", "skipped", "failed", "standard_error", "standard_out"
             exceptionFormat "short"
         }
+    }
+}
+
+task ios_tests(type: Test) {
+    useJUnitPlatform {
+        includeTags("ios_tests")
+    }
+}
+task android_tests(type: Test) {
+    useJUnitPlatform {
+        includeTags("android_tests")
     }
 }
 

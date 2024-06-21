@@ -15,7 +15,7 @@ import static com.codeborne.selenide.Selenide.open;
 
 public class TestBase {
     @BeforeAll
-    static void beforeAll() {
+    static void setUp() {
         Configuration.browser = BrowserstackDriver.class.getName();
         Configuration.browserSize = null;
         Configuration.timeout = 30000;
@@ -30,12 +30,10 @@ public class TestBase {
     @AfterEach
     void addAttachments() {
         String sessionId = Selenide.sessionId().toString();
-        System.out.println(sessionId);
 
-//        Attach.screenshotAs("Last screenshot"); // todo fix
-//        Attach.pageSource();
+        Attach.pageSource();
         closeWebDriver();
 
-//        Attach.addVideo(sessionId);
+        Attach.addVideo(sessionId);
     }
 }

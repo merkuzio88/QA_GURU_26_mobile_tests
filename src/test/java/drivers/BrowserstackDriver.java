@@ -1,6 +1,9 @@
 package drivers;
 
 import com.codeborne.selenide.WebDriverProvider;
+import config.AuthConfig;
+import config.PlatformsConfig;
+import org.aeonbits.owner.ConfigFactory;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
@@ -11,34 +14,32 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class BrowserstackDriver implements WebDriverProvider {
+
+    protected static PlatformsConfig platformsConfig = ConfigFactory.create(PlatformsConfig.class, System.getProperties());
+    protected static AuthConfig authConfig = ConfigFactory.create(AuthConfig.class, System.getProperties());
+
     @Nonnull
     @Override
     public WebDriver createDriver(@Nonnull Capabilities capabilities) {
-        // Основные возможности драйвера для W3C
         MutableCapabilities w3cCaps = new MutableCapabilities();
 
-        // Параметры платформы (устройство и ОС)
-        w3cCaps.setCapability("platformName", "Android");
-        w3cCaps.setCapability("appium:deviceName", "Google Pixel 7 Pro");
-        w3cCaps.setCapability("appium:osVersion", "13.0");
+        w3cCaps.setCapability("appium:deviceName", platformsConfig.getDevice());
+        w3cCaps.setCapability("appium:osVersion", platformsConfig.getOS());
 
-        // Параметры приложения
-        w3cCaps.setCapability("appium:app", "bs://sample.app");
+        w3cCaps.setCapability("appium:app", platformsConfig.getApp());
 
-        // Учетные данные и параметры для BrowserStack
         MutableCapabilities browserstackOptions = new MutableCapabilities();
-        browserstackOptions.setCapability("userName", "bsuser_mpduwc");
-        browserstackOptions.setCapability("accessKey", "8o2TCk438GnhCfmDBTPF");
-        browserstackOptions.setCapability("projectName", "BrowserStack Sample");
-        browserstackOptions.setCapability("buildName", "browserstack-build-1");
-        browserstackOptions.setCapability("sessionName", "first_test");
+        browserstackOptions.setCapability("userName", authConfig.getUser());
+        browserstackOptions.setCapability("accessKey", authConfig.getKey());
+        browserstackOptions.setCapability("projectName", platformsConfig.getProject());
+        browserstackOptions.setCapability("buildName", platformsConfig.getBuild());
+        browserstackOptions.setCapability("sessionName", platformsConfig.getName());
 
-        // Включаем BrowserStack опции в W3C возможности
         w3cCaps.setCapability("bstack:options", browserstackOptions);
 
-        // Подключаем WebDriver с заданными возможностями
         try {
-            return new RemoteWebDriver(new URL("https://hub.browserstack.com/wd/hub"), w3cCaps);
+            return new RemoteWebDriver(
+                    new URL(authConfig.getRemoteUrl()), w3cCaps);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
